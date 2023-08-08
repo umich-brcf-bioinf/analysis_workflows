@@ -1,0 +1,29 @@
+# Simple check that items references in hrefs exist:
+# cd to root
+# show me how site hrefs overlap generated html files
+# comm \
+#       <(find html/*.html -exec basename {} \; | sort) \
+#       <(egrep '^[^#].*href:' source/_site.yml | awk '{print $2}'| sort) \
+#   | awk -F'\t' 'BEGIN {OFS="\t\t\t\t"; print "in_html_only","in_site_only","in_both"} {print $1,$2,$3}'
+
+name: "Analysis workflows and methods"
+output_dir: ../html
+exclude: ["Example.md"]
+navbar:
+  title: "Analysis workflows and methods"
+  type: inverse
+  left:
+    - text: "RNA-Seq"
+      menu:
+        - text: "Bulk RNA-Seq"
+          href: bulk-rns-Seq.html
+        - text: "Single Cell RNA-Seq"
+          href: single-cell-rns-seq.html
+        - text: "Single Nuclei RNA-Seq"
+          href: single-nuclei-rna-seq.html
+    - text: "Epigenomics"
+      menu:
+        - text: "ATAC-Seq"
+          href: atac-seq.html
+        - text: "Methylation (EPIC)"
+          href: methylation-epic.html
