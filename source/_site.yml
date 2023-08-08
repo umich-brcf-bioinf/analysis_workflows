@@ -16,9 +16,9 @@ navbar:
     - text: "RNA-Seq"
       menu:
         - text: "Bulk RNA-Seq"
-          href: bulk-rns-Seq.html
+          href: bulk-rna-seq.html
         - text: "Single Cell RNA-Seq"
-          href: single-cell-rns-seq.html
+          href: single-cell-rna-seq.html
         - text: "Single Nuclei RNA-Seq"
           href: single-nuclei-rna-seq.html
     - text: "Epigenomics"
