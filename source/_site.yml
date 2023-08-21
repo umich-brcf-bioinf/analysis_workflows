@@ -24,6 +24,12 @@ navbar:
     - text: "Epigenomics"
       menu:
         - text: "ATAC-Seq"
-          href: atac-seq.html
+          href: bulk-atac-seq.html
+        - text: "ChIP-seq"
+          href: bulk-chip-seq.html
+        - text: "Cut and Run"
+          href: bulk-cut-and.html
         - text: "Methylation (EPIC)"
-          href: methylation-epic.html
+          href: dna-methylation-epic.html
+        - text: "Methylation (Sequencing)"
+          href: dna-methylation-seq.html

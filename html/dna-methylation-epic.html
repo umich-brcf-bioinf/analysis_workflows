@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-08-21" />
 
-<title>Bulk RNA-Seq</title>
+<title>EPIC Methylation Array</title>
 
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -68,6 +68,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -380,7 +402,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Bulk RNA-Seq</h1>
+<h1 class="title toc-ignore">EPIC Methylation Array</h1>
 <h4 class="author">UM Bioinformatics Core</h4>
 <h4 class="date">2023-08-21</h4>
 
@@ -398,23 +420,88 @@ pre {
   font-size: 12px
 }
 </style>
-<p><img src="images/bulk-rna-seq-workflow.png" alt="RNA-Seq workflow" style="width: 1000px;"/></p>
+<p><img src="images/Orochi_EPIC.png" alt="EPIC methylation array workflow" style="width: 1000px;"/></p>
 <div id="methods" class="section level3">
 <h3>Methods</h3>
-<p>Adapters will be trimmed with CutAdapt (34) to remove adapters and
-low-quality bases and overall quality will assessed with FastQC,
-FastQCScreen, and MultiQC (32,55,41). Reads will be aligned to Homo
-sapiens (human) genome assembly GRCh38 (hg38) and quantified using
-RSEM/STAR (55,57). Differential expression modeling will use the DESeq2
-(58). Intra and inter group variance will be assessed with Principal
-Component Analysis. Candidate DEGs are visualized with volcano plots
-filtered to the subset of DEGs where Benjamini-Hochberg adjusted p-value
-≤ 0.05 (59). Functional analysis using Advaita iPathwayGuide (60,61)
-will assess enrichment of KEGG pathways and Gene Ontology (GO)
-concepts.</p>
+<p>Samples are processed with the SeSAMe R Bioconductor package <span
+class="citation">(Zhou <em>et al.</em>, 2018)</span>. Briefly, red/green
+IDAT files are read and processed according to the <a
+href="https://zhou-lab.github.io/sesame/v1.18/sesame.html#Preprocessing_Function_Code">preparation
+code</a>. Experiment-independent masking occurs with the quality mask
+code (“Q”), and accounts for probes containing SNPs, with known
+cross-hybridization issues <span class="citation">(Pidsley <em>et
+al.</em>, 2013)</span>, and with other issues. Experiment-dependent is
+done according to the p-value with out-of-bound array hybridization
+(pOOBAH) algorithm (“P”), which is an improvement on detection p-value
+filtering <span class="citation">(Zhou <em>et al.</em>, 2018)</span>.
+Non-linear dye bias correction (“D”) is performed followed by background
+correction with the NOOB method (“B”) <span class="citation">(Fortin
+<em>et al.</em>, 2014)</span>. This processing pipeline constitutes a
+within-array normalization procedure. We note that recent studies have
+indicated within-array normalization with dye-bias correction and NOOB
+performs as well or better than between-array normalization procedures
+<span class="citation">(Welsh <em>et al.</em>, 2023)</span>.</p>
+<p>A probe has with pOOBAH masking (p-value &lt; 0.05) in more than 5%
+of samples it is removed. Similarly, if a sample has more than 10% of
+probes pOOBAH masked, then that sample is removed.</p>
+<p>Cell type deconvolution of whole blood or cord blood may be performed
+with the FlowSorted.Blood.EPIC or FlowSorted.CordBlood.450k R
+Bioconductor package, respectively, using a modified version of the
+Houseman method <span class="citation">(Houseman <em>et al.</em>,
+2012)</span>.</p>
+<p>In the event of a BS/oxBS or BS/TAB library preparation, methylation
+mark deconvolution may be performed using the MLML2R R package <span
+class="citation">(Qu <em>et al.</em>, 2013)</span>. Briefly, methylated
+and unmethylated channel matrices from bisulfite-only treated samples
+and oxidative-bisulfte treated samples are extracted and passed to
+MLML2R::MLML() to determine the levels of methylcytosine (mC),
+hydroxymethylcytosine (hmC), and cytosine (C) using the exact method
+provided in the package.</p>
 </div>
-<div id="references" class="section level3">
-<h3>References</h3>
+<div id="references" class="section level3 unnumbered">
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Fortin2014" class="csl-entry">
+Fortin,J.-P. <em>et al.</em> (2014) <a
+href="https://doi.org/10.1186/s13059-014-0503-2"><span
+class="nocase">Functional normalization of 450k methylation array data
+improves replication in large cancer studies</span></a>. <em>Genome
+Biology</em>, <strong>15</strong>, 503.
+</div>
+<div id="ref-houseman_dna_2012" class="csl-entry">
+Houseman,E.A. <em>et al.</em> (2012) <a
+href="https://doi.org/10.1186/1471-2105-13-86"><span>DNA</span>
+methylation arrays as surrogate measures of cell mixture
+distribution</a>. <em>BMC Bioinformatics</em>, <strong>13</strong>, 86.
+</div>
+<div id="ref-Pidsley2013" class="csl-entry">
+Pidsley,R. <em>et al.</em> (2013) <a
+href="https://doi.org/10.1186/1471-2164-14-293"><span class="nocase">A
+data-driven approach to preprocessing Illumina 450K methylation array
+data</span></a>. <em>BMC Genomics</em>, <strong>14</strong>.
+</div>
+<div id="ref-10.1093/bioinformatics/btt459" class="csl-entry">
+Qu,J. <em>et al.</em> (2013) <a
+href="https://doi.org/10.1093/bioinformatics/btt459"><span
+class="nocase">MLML: consistent simultaneous estimates of DNA
+methylation and hydroxymethylation</span></a>. <em>Bioinformatics</em>,
+<strong>29</strong>, 2645–2646.
+</div>
+<div id="ref-10.1186/s13148-023-01459-z" class="csl-entry">
+Welsh,H. <em>et al.</em> (2023) <a
+href="https://doi.org/10.1186/s13148-023-01459-z"><span class="nocase">A
+systematic evaluation of normalization methods and probe replicability
+using infinium EPIC methylation data</span></a>. <em>Clinical
+Epigenetics</em>, <strong>15</strong>, 41.
+</div>
+<div id="ref-10.1093/nar/gky691" class="csl-entry">
+Zhou,W. <em>et al.</em> (2018) <a
+href="https://doi.org/10.1093/nar/gky691"><span class="nocase">SeSAMe:
+reducing artifactual detection of DNA methylation by Infinium BeadChips
+in genomic deletions</span></a>. <em>Nucleic Acids Research</em>,
+<strong>46</strong>, e123–e123.
+</div>
+</div>
 </div>
 
 

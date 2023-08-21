@@ -1,0 +1,55 @@
+---
+title: "Bulk ATAC-Seq"
+author: "UM Bioinformatics Core"
+date: "`r Sys.Date()`"
+output:
+        html_document:
+            includes:
+                in_header: header.html
+            theme: paper
+            toc: true
+            toc_depth: 4
+            toc_float: true
+            number_sections: false
+            fig_caption: true
+            markdown: GFM
+            code_download: false
+bibliography: references.bib
+csl: bioinformatics.csl
+---
+
+<style type="text/css">
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 12px;
+}
+pre {
+  font-size: 12px
+}
+</style>
+
+<img src="images/Orochi_atac.png" alt="ATAC-Seq workflow" style="width: 1000px;"/>
+
+### Methods
+
+We use FastQC [@noauthor_fastqc_nodate] (v0.11.8) to assess the overall quality of each sequenced sample.
+
+We use TrimGalore [@noauthor_trimgalore_nodate] (v0.4.5) and cutadapt [@martin_cutadapt_nodate] (v1.15) with the following parameters: `--nextera -e 0.1 --stringency 6 --length 20 --nextseq 20`.
+
+We align trimmed reads to the reference genome with Bowtie2 [@langmead_fast_2012] (v2.3.4.1) with the following parameters: `-X 2000 --no-mixed --no-discordant`, and defaults multi-seed length of 20bp with 0 mismatches.
+
+Duplicate reads are marked with Picard [@noauthor_picard_nodate] (v2.20.2).
+
+Alignments to autosomes and sex chromosomes are kept (i.e. mitochondrial reads are removed), duplicates marked by Picard are removed, and alignments below a MAPQ threshold are removed. These filtering steps are performed with samtools [@li_sequence_2009] (v1.2) and the parameters: `-q 10 -F 1024`.
+
+Reads completely overlapping blacklisted regions [@noauthor_encode_nodate] are removed with bedtools [@quinlan_bedtools_2010] (v2.28.0).
+
+Sample-wise peaks are called with macs2 [@zhang_model-based_2008] (v2.1.2) with flags: `-f BAM --nomodel --shift -100 --extsize 200`.
+
+Peaks over all samples are merged with bedops [@neph_bedops_2012] (v2.4.36) for the purpose of principal component analysis and unsupervised clustering to assess the similarity of samples.
+
+Finally, MultiQC [@ewels_multiqc_2016] (v1.7) generates a report combining FastQC, trimming, alignment, and duplicate calling over all the samples. For ATAC specific QC metrics we use ataqv [@noauthor_ataqv_nodate] (v1.0.0).
+
+### References

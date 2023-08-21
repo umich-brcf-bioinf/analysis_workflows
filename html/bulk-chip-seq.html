@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-08-21" />
 
-<title>Bulk RNA-Seq</title>
+<title>Bulk ChIP-Seq</title>
 
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -68,6 +68,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -380,7 +402,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Bulk RNA-Seq</h1>
+<h1 class="title toc-ignore">Bulk ChIP-Seq</h1>
 <h4 class="author">UM Bioinformatics Core</h4>
 <h4 class="date">2023-08-21</h4>
 
@@ -398,23 +420,146 @@ pre {
   font-size: 12px
 }
 </style>
-<p><img src="images/bulk-rna-seq-workflow.png" alt="RNA-Seq workflow" style="width: 1000px;"/></p>
+<p><img src="images/Orochi_chipdip.png" alt="ChIP-Seq workflow" style="width: 1000px;"/></p>
 <div id="methods" class="section level3">
 <h3>Methods</h3>
-<p>Adapters will be trimmed with CutAdapt (34) to remove adapters and
-low-quality bases and overall quality will assessed with FastQC,
-FastQCScreen, and MultiQC (32,55,41). Reads will be aligned to Homo
-sapiens (human) genome assembly GRCh38 (hg38) and quantified using
-RSEM/STAR (55,57). Differential expression modeling will use the DESeq2
-(58). Intra and inter group variance will be assessed with Principal
-Component Analysis. Candidate DEGs are visualized with volcano plots
-filtered to the subset of DEGs where Benjamini-Hochberg adjusted p-value
-≤ 0.05 (59). Functional analysis using Advaita iPathwayGuide (60,61)
-will assess enrichment of KEGG pathways and Gene Ontology (GO)
-concepts.</p>
+<p>We use FastQC <span class="citation">(<span>FastQC</span>)</span>
+(v0.11.8) to assess the overall quality of each sequenced sample.</p>
+<p>We use TrimGalore <span
+class="citation">(<span>TrimGalore</span>)</span> (v0.4.5) and cutadapt
+<span class="citation">(Martin)</span> (v1.15) with the following
+parameters:
+<code>--nextera -e 0.1 --stringency 6 --length 20 --nextseq 20</code>.</p>
+<p>We align trimmed reads to the reference genome with Bowtie2 <span
+class="citation">(Langmead and Salzberg, 2012)</span> (v2.3.4.1) using
+default parameters with the exception of the following flags:
+<code>-X 2000</code>.</p>
+<p>Duplicate reads may be are marked with Picard <span
+class="citation">(Picard)</span> (v2.20.2).</p>
+<p>Alignments are filtered with samtools <span class="citation">(Li
+<em>et al.</em>, 2009)</span> (v1.2) using the flags:
+<code>-q 10 -F 1024</code>.</p>
+<p>Alignments completely overlapping blacklisted regions <span
+class="citation">(<span>ENCODE</span> <span>Blacklist</span>
+<span>Regions</span>)</span> are removed with bedtools <span
+class="citation">(Quinlan and Hall, 2010)</span> (v2.28.0).</p>
+<p>Sample-wise peaks are called with macs2 <span class="citation">(Zhang
+<em>et al.</em>, 2008)</span> (v2.1.2) with flags:
+<code>--format BAMPE --gsize mm --qvalue 0.05</code>.</p>
+<p>Optionally, consensus peaks for replicates are determined by mutual
+intersection of sample-wise peaks with bedops –intersect. Consensus
+peaks are then annotated with annotatr <span
+class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
+<p>Optionally, motifs for consensus peaks are found with HOMER <span
+class="citation">(Heinz <em>et al.</em>, 2010)</span> (v4.11.1).</p>
+<p>Peaks over all samples are merged with bedops <span
+class="citation">(Neph <em>et al.</em>, 2012)</span> (v2.4.36) for the
+purpose of principal component analysis and unsupervised clustering to
+assess the similarity of samples. Read cross-correlations within samples
+are plotted using phantompeakqualtools <span class="citation">(Landt
+<em>et al.</em>, 2012)</span>. MultiQC <span class="citation">(Ewels
+<em>et al.</em>, 2016)</span> (v1.7) generates a report combining
+FastQC, trimming, alignment, and duplicate calling over all the samples.
+The software DeepTools is used to calculate coverage and IP efficiency
+plots <span class="citation">(Ramírez <em>et al.</em>, 2016)</span>
+(v3.3.0).</p>
 </div>
-<div id="references" class="section level3">
-<h3>References</h3>
+<div id="references" class="section level3 unnumbered">
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cavalcante_annotatr_2017" class="csl-entry">
+Cavalcante,R.G. and Sartor,M.A. (2017) <a
+href="https://doi.org/10.1093/bioinformatics/btx183">Annotatr: Genomic
+regions in context</a>. <em>Bioinformatics</em>, <strong>33</strong>,
+2381–2383.
+</div>
+<div id="ref-noauthor_encode_nodate" class="csl-entry">
+<a
+href="https://sites.google.com/site/anshulkundaje/projects/blacklists"><span>ENCODE</span>
+<span>Blacklist</span> <span>Regions</span></a>
+<em>https://sites.google.com/site/anshulkundaje/projects/blacklists</em>.
+</div>
+<div id="ref-ewels_multiqc_2016" class="csl-entry">
+Ewels,P. <em>et al.</em> (2016) <a
+href="https://doi.org/10.1093/bioinformatics/btw354"><span>MultiQC</span>:
+Summarize analysis results for multiple tools and samples in a single
+report</a>. <em>Bioinformatics</em>, <strong>32</strong>, 3047–3048.
+</div>
+<div id="ref-noauthor_fastqc_nodate" class="csl-entry">
+<a href="https://github.com/s-andrews/FastQC"><span>FastQC</span></a>
+<em>https://github.com/s-andrews/FastQC</em>.
+</div>
+<div id="ref-heinz_simple_2010" class="csl-entry">
+Heinz,S. <em>et al.</em> (2010) <a
+href="https://doi.org/10.1016/j.molcel.2010.05.004">Simple
+<span>Combinations</span> of
+<span>Lineage</span>-<span>Determining</span> <span>Transcription</span>
+<span>Factors</span> <span>Prime</span> cis-<span>Regulatory</span>
+<span>Elements</span> <span>Required</span> for <span>Macrophage</span>
+and <span>B</span> <span>Cell</span> <span>Identities</span></a>.
+<em>Molecular Cell</em>, <strong>38</strong>, 576–589.
+</div>
+<div id="ref-landt_chip-seq_2012" class="csl-entry">
+Landt,S.G. <em>et al.</em> (2012) <a
+href="https://doi.org/10.1101/gr.136184.111"><span>ChIP</span>-seq
+guidelines and practices of the <span>ENCODE</span> and <span
+class="nocase">modENCODE</span> consortia</a>. <em>Genome Research</em>,
+<strong>22</strong>, 1813–1831.
+</div>
+<div id="ref-langmead_fast_2012" class="csl-entry">
+Langmead,B. and Salzberg,S.L. (2012) <a
+href="https://doi.org/10.1038/nmeth.1923">Fast gapped-read alignment
+with <span>Bowtie</span> 2</a>. <em>Nature Methods</em>,
+<strong>9</strong>, 357–359.
+</div>
+<div id="ref-li_sequence_2009" class="csl-entry">
+Li,H. <em>et al.</em> (2009) <a
+href="https://doi.org/10.1093/bioinformatics/btp352">The
+<span>Sequence</span> <span>Alignment</span>/<span>Map</span> format and
+<span>SAMtools</span></a>. <em>Bioinformatics</em>, <strong>25</strong>,
+2078–2079.
+</div>
+<div id="ref-martin_cutadapt_nodate" class="csl-entry">
+Martin,M. <a href="https://doi.org/10.14806/ej.17.1.200">Cutadapt
+removes adapter sequences from high-throughput sequencing reads</a>.
+<em>EMBnet.journal</em>, <strong>17</strong>, 3.
+</div>
+<div id="ref-neph_bedops_2012" class="csl-entry">
+Neph,S. <em>et al.</em> (2012) <a
+href="https://doi.org/10.1093/bioinformatics/bts277"><span>BEDOPS</span>:
+High-performance genomic feature operations</a>.
+<em>Bioinformatics</em>, <strong>28</strong>, 1919–1920.
+</div>
+<div id="ref-noauthor_picard_nodate" class="csl-entry">
+<a href="https://github.com/broadinstitute/picard">Picard</a>
+<em>https://github.com/broadinstitute/picard</em>.
+</div>
+<div id="ref-quinlan_bedtools_2010" class="csl-entry">
+Quinlan,A.R. and Hall,I.M. (2010) <a
+href="https://doi.org/10.1093/bioinformatics/btq033"><span>BEDTools</span>:
+A flexible suite of utilities for comparing genomic features</a>.
+<em>Bioinformatics</em>, <strong>26</strong>, 841–842.
+</div>
+<div id="ref-ramirez_deeptools2_2016" class="csl-entry">
+Ramírez,F. <em>et al.</em> (2016) <a
+href="https://doi.org/10.1093/nar/gkw257"><span
+class="nocase">deepTools2</span>: A next generation web server for
+deep-sequencing data analysis</a>. <em>Nucleic Acids Research</em>,
+<strong>44</strong>, W160–W165.
+</div>
+<div id="ref-noauthor_trimgalore_nodate" class="csl-entry">
+<a
+href="https://github.com/FelixKrueger/TrimGalore"><span>TrimGalore</span></a>
+<em>https://github.com/FelixKrueger/TrimGalore</em>.
+</div>
+<div id="ref-zhang_model-based_2008" class="csl-entry">
+Zhang,Y. <em>et al.</em> (2008) <a
+href="https://doi.org/10.1186/gb-2008-9-9-r137">Model-based
+<span>Analysis</span> of <span>ChIP</span>-<span>Seq</span>
+(<span>MACS</span>)</a>. <em>Genome Biology</em>, <strong>9</strong>,
+R137.
+</div>
+</div>
 </div>
 
 

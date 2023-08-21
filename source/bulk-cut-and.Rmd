@@ -1,0 +1,59 @@
+---
+title: "Bulk Cut and Run"
+author: "UM Bioinformatics Core"
+date: "`r Sys.Date()`"
+output:
+        html_document:
+            includes:
+                in_header: header.html
+            theme: paper
+            toc: true
+            toc_depth: 4
+            toc_float: true
+            number_sections: false
+            fig_caption: true
+            markdown: GFM
+            code_download: false
+bibliography: references.bib
+csl: bioinformatics.csl
+---
+
+<style type="text/css">
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 12px;
+}
+pre {
+  font-size: 12px
+}
+</style>
+
+<img src="images/Orochi_chipdip.png" alt="Cut and Run workflow" style="width: 1000px;"/>
+
+### Methods
+
+We use FastQC [@noauthor_fastqc_nodate] (v0.11.8) to assess the overall quality of each sequenced sample. 
+
+We use trimmomatic [@bolger_trimmomatic_2014] (v0.39) with the following paramters: `ILLUMINACLIP:{adapter_path}:2:15:4:4:true LEADING:20 TRAILING:20 SLIDINGWINDOW:4:15 MINLEN:25`, followed by kseq [@zhu_cutruntools_2019] to ensure read lengths of at least 50bp. 
+
+We align trimmed reads to the genome with Bowtie2 [@langmead_fast_2012] (v2.3.4.1) using default parameters with the exception of the following flags: `--dovetail`
+
+Duplicate reads may be are marked with Picard [@noauthor_picard_nodate] (v2.20.2).
+
+Alignments are filtered with samtools [@li_sequence_2009] (v1.2) using the flags: `-F4 -F8 -f3 -q10 -F1024`. 
+
+Alignments completely overlapping blacklisted regions [@noauthor_encode_nodate] are removed with bedtools [@quinlan_bedtools_2010] (v2.28.0). 
+
+Following the Cut and Run Tools pipeline [@zhu_cutruntools_2019], reads are filtered for fragment lengths less than 120 bp.
+
+Sample-wise peaks are called with macs2 [@zhang_model-based_2008] (v2.1.2) with flags: `-B --SPMR --format BAM --gsize {macs_genome}`.
+
+Optionally, consensus peaks for replicates are determined by mutual intersection of sample-wise peaks with bedops --intersect. Consensus peaks are then annotated with annotatr [@cavalcante_annotatr_2017].
+
+Optionally, motifs are determined with the MEME suite [@machanick_meme-chip_2011] (v5.1.1) followed by footprinting with CENTIPEDE [@pique-regi_accurate_2011] (v1.2) as in the Cut and Run Tools pipeline [@zhu_cutruntools_2019].
+
+Peaks over all samples are merged with bedops [@neph_bedops_2012] (v2.4.36) for the purpose of principal component analysis and unsupervised clustering to assess the similarity of samples. Read cross-correlations within samples are plotted using phantompeakqualtools [@landt_chip-seq_2012]. MultiQC [@ewels_multiqc_2016] (v1.7) generates a report combining FastQC, trimming, alignment, and duplicate calling over all the samples. The software DeepTools is used to calculate coverage and IP efficiency plots [@ramirez_deeptools2_2016] (v3.3.0).
+
+### References
