@@ -32,7 +32,9 @@ pre {
 
 <img src="images/Orochi_atac.png" alt="ATAC-Seq workflow" style="width: 1000px;"/>
 
-### Methods
+## Methods
+
+### QC
 
 We use FastQC [@noauthor_fastqc_nodate] (v0.11.8) to assess the overall quality of each sequenced sample.
 
@@ -52,4 +54,12 @@ Peaks over all samples are merged with bedops [@neph_bedops_2012] (v2.4.36) for 
 
 Finally, MultiQC [@ewels_multiqc_2016] (v1.7) generates a report combining FastQC, trimming, alignment, and duplicate calling over all the samples. For ATAC specific QC metrics we use ataqv [@noauthor_ataqv_nodate] (v1.0.0).
 
-### References
+### Differential Testing
+
+We use the edgeR R Bioconductor package [@mccarthy_differential_2012] to identify regions of differentially open chromatin (DOC). For each sample, the number of reads in the merged peaks is counted for each sample, and a library size normalization factor is determined. With no replicates, we manually tune the BCV (biological coefficient of variance) parameter. We then fit each model using the glmFit function, and test each contrast with a likelihood ratio test. With replicates, the common, trended, and tagwise negative binomial dispersions are calculated. We then fit each model using the glmQLFit function, and test each contrast with an empirical Bayes quasi-likelihood F-test. The DOC are then annotated to genic and CpG island annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
+
+### Footprinting
+
+We use the HINT tool in the Regulatory Genomics Toolbox (rgt-hint) to do footprinting and motif binding analysis [@li_hint_2019]. Briefly, for each condition, the reads among the replicates are pooled and tag counts are determined within the merged peaks. Next motifs from the JASPAR database [@jaspar] are queried against the footprints found within each condition. Finally, a differential score representing the transcription factor binding activity and the openness of the surrounding chromatin is calculated and visualized between pairs of conditions.
+
+## References

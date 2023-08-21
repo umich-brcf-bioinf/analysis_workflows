@@ -32,7 +32,9 @@ pre {
 
 <img src="images/Orochi_EPIC.png" alt="EPIC methylation array workflow" style="width: 1000px;"/>
 
-### Methods
+## Methods
+
+### QC
 
 Samples are processed with the SeSAMe R Bioconductor package [@10.1093/nar/gky691]. Briefly, red/green IDAT files are read and processed according to the [preparation code](https://zhou-lab.github.io/sesame/v1.18/sesame.html#Preprocessing_Function_Code). Experiment-independent masking occurs with the quality mask code ("Q"), and accounts for probes containing SNPs, with known cross-hybridization issues [@Pidsley2013], and with other issues. Experiment-dependent is done according to the p-value with out-of-bound array hybridization (pOOBAH) algorithm ("P"), which is an improvement on detection p-value filtering [@10.1093/nar/gky691]. Non-linear dye bias correction ("D") is performed followed by background correction with the NOOB method ("B") [@Fortin2014]. This processing pipeline constitutes a within-array normalization procedure. We note that recent studies have indicated within-array normalization with dye-bias correction and NOOB performs as well or better than between-array normalization procedures [@10.1186/s13148-023-01459-z].
 
@@ -42,4 +44,14 @@ Cell type deconvolution of whole blood or cord blood may be performed with the F
 
 In the event of a BS/oxBS or BS/TAB library preparation, methylation mark deconvolution may be performed using the MLML2R R package [@10.1093/bioinformatics/btt459]. Briefly, methylated and unmethylated channel matrices from bisulfite-only treated samples and oxidative-bisulfte treated samples are extracted and passed to MLML2R::MLML() to determine the levels of methylcytosine (mC), hydroxymethylcytosine (hmC), and cytosine (C) using the exact method provided in the package.
 
-### References
+### Differential Testing
+
+#### Without Mark Deconvolution
+
+For each comparison we use the limma R Bioconductor package to identify differentially methylated probes (DMPs) by fitting a linear model on the M-values whose standard errors are then moderated using an empirical Bayes model [@Ritchie2015]. The DMPs are then annotated to CpG island and genic annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
+
+#### With Mark Deconvolution
+
+For each comparison we use the gamlss R package to identify differentially methylated probes (DMPs) by fitting a beta-regression model on the beta-values [@stasinopoulos_generalized_2007]. The DMPs are then annotated to CpG island and genic annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
+
+## References

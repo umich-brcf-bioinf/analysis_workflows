@@ -32,7 +32,8 @@ pre {
 
 <img src="images/bulk-rna-seq-workflow.png" alt="RNA-Seq workflow" style="width: 1000px;"/>
 
-### Methods
+## Methods
+
 Adapters will be trimmed with CutAdapt (34) to remove adapters and low-quality bases and overall quality will assessed with FastQC, FastQCScreen, and MultiQC (32,55,41). Reads will be aligned to Homo sapiens (human) genome assembly GRCh38 (hg38) and quantified using RSEM/STAR (55,57). Differential expression modeling  will use the DESeq2 (58). Intra and inter group variance will be assessed with Principal Component Analysis. Candidate DEGs are visualized with volcano plots filtered to the subset of DEGs where Benjamini-Hochberg adjusted p-value ≤ 0.05 (59). Functional analysis using Advaita iPathwayGuide (60,61) will assess enrichment of KEGG pathways and Gene Ontology (GO) concepts.
 
-### References
+## References

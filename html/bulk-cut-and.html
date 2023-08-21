@@ -421,8 +421,10 @@ pre {
 }
 </style>
 <p><img src="images/Orochi_chipdip.png" alt="Cut and Run workflow" style="width: 1000px;"/></p>
-<div id="methods" class="section level3">
-<h3>Methods</h3>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
+<div id="qc" class="section level3">
+<h3>QC</h3>
 <p>We use FastQC <span class="citation">(<span>FastQC</span>)</span>
 (v0.11.8) to assess the overall quality of each sequenced sample.</p>
 <p>We use trimmomatic <span class="citation">(Bolger <em>et al.</em>,
@@ -470,8 +472,25 @@ The software DeepTools is used to calculate coverage and IP efficiency
 plots <span class="citation">(Ramírez <em>et al.</em>, 2016)</span>
 (v3.3.0).</p>
 </div>
-<div id="references" class="section level3 unnumbered">
-<h3 class="unnumbered">References</h3>
+<div id="differential-testing" class="section level3">
+<h3>Differential Testing</h3>
+<p>We use the edgeR R Bioconductor package <span
+class="citation">(McCarthy <em>et al.</em>, 2012)</span> to identify
+regions of differential binding. For each sample, the number of reads in
+the merged peaks is counted for each sample, and a library size
+normalization factor is determined. With no replicates, we manually tune
+the BCV (biological coefficient of variance) parameter. We then fit each
+model using the glmFit function, and test each contrast with a
+likelihood ratio test. With replicates, the common, trended, and tagwise
+negative binomial dispersions are calculated. We then fit each model
+using the glmQLFit function, and test each contrast with an empirical
+Bayes quasi-likelihood F-test. The differential peaks are then annotated
+to genic and CpG island annotations using the annotatr R Bioconductor
+package <span class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-bolger_trimmomatic_2014" class="csl-entry">
 Bolger,A.M. <em>et al.</em> (2014) <a
@@ -526,6 +545,13 @@ Machanick,P. and Bailey,T.L. (2011) <a
 href="https://doi.org/10.1093/bioinformatics/btr189"><span>MEME</span>-<span>ChIP</span>:
 Motif analysis of large <span>DNA</span> datasets</a>.
 <em>Bioinformatics</em>, <strong>27</strong>, 1696–1697.
+</div>
+<div id="ref-mccarthy_differential_2012" class="csl-entry">
+McCarthy,D.J. <em>et al.</em> (2012) <a
+href="https://doi.org/10.1093/nar/gks042">Differential expression
+analysis of multifactor <span>RNA</span>-<span>Seq</span> experiments
+with respect to biological variation</a>. <em>Nucleic Acids
+Research</em>, <strong>40</strong>, 4288–4297.
 </div>
 <div id="ref-neph_bedops_2012" class="csl-entry">
 Neph,S. <em>et al.</em> (2012) <a

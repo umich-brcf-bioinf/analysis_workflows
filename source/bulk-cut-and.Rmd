@@ -32,7 +32,9 @@ pre {
 
 <img src="images/Orochi_chipdip.png" alt="Cut and Run workflow" style="width: 1000px;"/>
 
-### Methods
+## Methods
+
+### QC
 
 We use FastQC [@noauthor_fastqc_nodate] (v0.11.8) to assess the overall quality of each sequenced sample. 
 
@@ -56,4 +58,8 @@ Optionally, motifs are determined with the MEME suite [@machanick_meme-chip_2011
 
 Peaks over all samples are merged with bedops [@neph_bedops_2012] (v2.4.36) for the purpose of principal component analysis and unsupervised clustering to assess the similarity of samples. Read cross-correlations within samples are plotted using phantompeakqualtools [@landt_chip-seq_2012]. MultiQC [@ewels_multiqc_2016] (v1.7) generates a report combining FastQC, trimming, alignment, and duplicate calling over all the samples. The software DeepTools is used to calculate coverage and IP efficiency plots [@ramirez_deeptools2_2016] (v3.3.0).
 
-### References
+### Differential Testing
+
+We use the edgeR R Bioconductor package [@mccarthy_differential_2012] to identify regions of differential binding. For each sample, the number of reads in the merged peaks is counted for each sample, and a library size normalization factor is determined. With no replicates, we manually tune the BCV (biological coefficient of variance) parameter. We then fit each model using the glmFit function, and test each contrast with a likelihood ratio test. With replicates, the common, trended, and tagwise negative binomial dispersions are calculated. We then fit each model using the glmQLFit function, and test each contrast with an empirical Bayes quasi-likelihood F-test. The differential peaks are then annotated to genic and CpG island annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
+
+## References

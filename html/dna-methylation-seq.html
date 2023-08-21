@@ -421,8 +421,10 @@ pre {
 }
 </style>
 <p><img src="images/Orochi_bs.png" alt="DNA methylation workflow" style="width: 1000px;"/></p>
-<div id="methods" class="section level3">
-<h3>Methods</h3>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
+<div id="qc" class="section level3">
+<h3>QC</h3>
 <p>We use FastQC <span class="citation">(<span>FastQC</span>)</span>
 (v0.11.8) to assess the overall quality of each sequenced sample.</p>
 <p>We use TrimGalore <span class="citation">(@
@@ -454,9 +456,40 @@ MLML2R::MLML() to determine the levels of methylcytosine (mC),
 hydroxymethylcytosine (hmC), and cytosine (C) using the exact method
 provided in the package.</p>
 </div>
-<div id="references" class="section level3 unnumbered">
-<h3 class="unnumbered">References</h3>
+<div id="differential-testing" class="section level3">
+<h3>Differential Testing</h3>
+<div id="without-mark-deconvolution" class="section level4">
+<h4>Without Mark Deconvolution</h4>
+<p>Differential methylation testing is performed with the MethylSig R
+Bioconductor package which performs group-versus-group tests using a
+beta-binomial approach to calculate differential methylation statistics,
+accounting for variation among replicates within each group <span
+class="citation">(Park <em>et al.</em>, 2014)</span>. Alternately,
+differential methylation testing can be performed with the DSS R
+bioconductor package which is a beta-binomial approach with arcsine link
+function to test under general experimental design <span
+class="citation">(Wu and Park, 2016)</span>.</p>
+</div>
+<div id="with-mark-deconvolution" class="section level4">
+<h4>With Mark Deconvolution</h4>
+<p>We use the gamlss R package to identify differentially methylated
+probes (DMPs) by fitting a beta-regression model on the beta-values
+<span class="citation">(Stasinopoulos and Rigby, 2007)</span>. The DMPs
+are then annotated to CpG island and genic annotations using the
+annotatr R Bioconductor package <span class="citation">(Cavalcante and
+Sartor, 2017)</span>.</p>
+</div>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cavalcante_annotatr_2017" class="csl-entry">
+Cavalcante,R.G. and Sartor,M.A. (2017) <a
+href="https://doi.org/10.1093/bioinformatics/btx183">Annotatr: Genomic
+regions in context</a>. <em>Bioinformatics</em>, <strong>33</strong>,
+2381–2383.
+</div>
 <div id="ref-noauthor_fastqc_nodate" class="csl-entry">
 <a href="https://github.com/s-andrews/FastQC"><span>FastQC</span></a>
 <em>https://github.com/s-andrews/FastQC</em>.
@@ -485,6 +518,11 @@ href="https://doi.org/10.1093/bioinformatics/btp352">The
 href="https://github.com/dpryan79/MethylDackel"><span>MethylDackel</span></a>
 <em>https://github.com/dpryan79/MethylDackel</em>.
 </div>
+<div id="ref-Park:2014ho" class="csl-entry">
+Park,Y. <em>et al.</em> (2014) <span class="nocase">MethylSig: a whole
+genome DNA methylation analysis pipeline.</span>
+<em>Bioinformatics</em>, <strong>30</strong>, 2414–2422.
+</div>
 <div id="ref-noauthor_picard_nodate" class="csl-entry">
 <a href="https://github.com/broadinstitute/picard">Picard</a>
 <em>https://github.com/broadinstitute/picard</em>.
@@ -495,6 +533,19 @@ href="https://doi.org/10.1093/bioinformatics/btt459"><span
 class="nocase">MLML: consistent simultaneous estimates of DNA
 methylation and hydroxymethylation</span></a>. <em>Bioinformatics</em>,
 <strong>29</strong>, 2645–2646.
+</div>
+<div id="ref-stasinopoulos_generalized_2007" class="csl-entry">
+Stasinopoulos,D.M. and Rigby,R.A. (2007) <a
+href="https://doi.org/10.18637/jss.v023.i07">Generalized
+<span>Additive</span> <span>Models</span> for <span>Location</span>
+<span>Scale</span> and <span>Shape</span> (<span>GAMLSS</span>) in
+<em>r</em></a>. <em>Journal of Statistical Software</em>,
+<strong>23</strong>.
+</div>
+<div id="ref-Wu:2016hq" class="csl-entry">
+Wu,H. and Park,Y. (2016) <span class="nocase">Differential methylation
+analysis for BS-seq data under general experimental design</span>.
+<em>Bioinformatics</em>, <strong>32</strong>, 1446–1453.
 </div>
 </div>
 </div>

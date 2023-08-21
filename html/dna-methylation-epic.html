@@ -421,8 +421,10 @@ pre {
 }
 </style>
 <p><img src="images/Orochi_EPIC.png" alt="EPIC methylation array workflow" style="width: 1000px;"/></p>
-<div id="methods" class="section level3">
-<h3>Methods</h3>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
+<div id="qc" class="section level3">
+<h3>QC</h3>
 <p>Samples are processed with the SeSAMe R Bioconductor package <span
 class="citation">(Zhou <em>et al.</em>, 2018)</span>. Briefly, red/green
 IDAT files are read and processed according to the <a
@@ -458,9 +460,38 @@ MLML2R::MLML() to determine the levels of methylcytosine (mC),
 hydroxymethylcytosine (hmC), and cytosine (C) using the exact method
 provided in the package.</p>
 </div>
-<div id="references" class="section level3 unnumbered">
-<h3 class="unnumbered">References</h3>
+<div id="differential-testing" class="section level3">
+<h3>Differential Testing</h3>
+<div id="without-mark-deconvolution" class="section level4">
+<h4>Without Mark Deconvolution</h4>
+<p>For each comparison we use the limma R Bioconductor package to
+identify differentially methylated probes (DMPs) by fitting a linear
+model on the M-values whose standard errors are then moderated using an
+empirical Bayes model <span class="citation">(Ritchie <em>et al.</em>,
+2015)</span>. The DMPs are then annotated to CpG island and genic
+annotations using the annotatr R Bioconductor package <span
+class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
+</div>
+<div id="with-mark-deconvolution" class="section level4">
+<h4>With Mark Deconvolution</h4>
+<p>For each comparison we use the gamlss R package to identify
+differentially methylated probes (DMPs) by fitting a beta-regression
+model on the beta-values <span class="citation">(Stasinopoulos and
+Rigby, 2007)</span>. The DMPs are then annotated to CpG island and genic
+annotations using the annotatr R Bioconductor package <span
+class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
+</div>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-cavalcante_annotatr_2017" class="csl-entry">
+Cavalcante,R.G. and Sartor,M.A. (2017) <a
+href="https://doi.org/10.1093/bioinformatics/btx183">Annotatr: Genomic
+regions in context</a>. <em>Bioinformatics</em>, <strong>33</strong>,
+2381–2383.
+</div>
 <div id="ref-Fortin2014" class="csl-entry">
 Fortin,J.-P. <em>et al.</em> (2014) <a
 href="https://doi.org/10.1186/s13059-014-0503-2"><span
@@ -486,6 +517,20 @@ href="https://doi.org/10.1093/bioinformatics/btt459"><span
 class="nocase">MLML: consistent simultaneous estimates of DNA
 methylation and hydroxymethylation</span></a>. <em>Bioinformatics</em>,
 <strong>29</strong>, 2645–2646.
+</div>
+<div id="ref-Ritchie2015" class="csl-entry">
+Ritchie,M.E. <em>et al.</em> (2015) <span class="nocase">limma powers
+differential expression analyses for RNA-sequencing and microarray
+studies.</span> <em>Nucleic Acids Research</em>, <strong>43</strong>,
+e47–e47.
+</div>
+<div id="ref-stasinopoulos_generalized_2007" class="csl-entry">
+Stasinopoulos,D.M. and Rigby,R.A. (2007) <a
+href="https://doi.org/10.18637/jss.v023.i07">Generalized
+<span>Additive</span> <span>Models</span> for <span>Location</span>
+<span>Scale</span> and <span>Shape</span> (<span>GAMLSS</span>) in
+<em>r</em></a>. <em>Journal of Statistical Software</em>,
+<strong>23</strong>.
 </div>
 <div id="ref-10.1186/s13148-023-01459-z" class="csl-entry">
 Welsh,H. <em>et al.</em> (2023) <a
