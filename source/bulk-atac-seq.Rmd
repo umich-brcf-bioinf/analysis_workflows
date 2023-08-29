@@ -30,9 +30,11 @@ pre {
 }
 </style>
 
-<img src="images/Orochi_atac.png" alt="ATAC-Seq workflow" style="width: 1000px;"/>
+![ATAC-Seq workflow](images/Orochi_atac.png)
 
+```{asis, echo = !all_methods}
 ## Methods
+```
 
 ### QC
 
@@ -62,4 +64,6 @@ We use the edgeR R Bioconductor package [@mccarthy_differential_2012] to identif
 
 We use the HINT tool in the Regulatory Genomics Toolbox (rgt-hint) to do footprinting and motif binding analysis [@li_hint_2019]. Briefly, for each condition, the reads among the replicates are pooled and tag counts are determined within the merged peaks. Next motifs from the JASPAR database [@jaspar] are queried against the footprints found within each condition. Finally, a differential score representing the transcription factor binding activity and the openness of the surrounding chromatin is calculated and visualized between pairs of conditions.
 
+```{asis, echo = !all_methods}
 ## References
+```

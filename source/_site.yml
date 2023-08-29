@@ -13,14 +13,12 @@ navbar:
   title: "Analysis workflows and methods"
   type: inverse
   left:
-    - text: "RNA-Seq"
+    - text: "Gene Expression"
       menu:
         - text: "Bulk RNA-Seq"
           href: bulk-rna-seq.html
-        - text: "Single Cell RNA-Seq"
-          href: single-cell-rna-seq.html
-        - text: "Single Nuclei RNA-Seq"
-          href: single-nuclei-rna-seq.html
+        - text: "Single Cell/Nuclei RNA-Seq"
+          href: scsn-rna-seq.html
     - text: "Epigenomics"
       menu:
         - text: "ATAC-Seq"
@@ -33,3 +31,7 @@ navbar:
           href: dna-methylation-epic.html
         - text: "Methylation (Sequencing)"
           href: dna-methylation-seq.html
+    - text: "Spatial"
+      menu:
+        - text: "Nanostring GeoMX"
+          href: spatial-GeoMX.html

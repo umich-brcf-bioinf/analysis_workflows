@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-08-29" />
 
-<title>Bulk ATAC-Seq</title>
+<title>Single Cell/Nuclei RNA-Seq</title>
 
 <script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -411,7 +411,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Bulk ATAC-Seq</h1>
+<h1 class="title toc-ignore">Single Cell/Nuclei RNA-Seq</h1>
 <h4 class="author">UM Bioinformatics Core</h4>
 <h4 class="date">2023-08-29</h4>
 
@@ -430,174 +430,112 @@ pre {
 }
 </style>
 <div class="float">
-<img src="images/Orochi_atac.png" alt="ATAC-Seq workflow" />
-<div class="figcaption">ATAC-Seq workflow</div>
+<img src="images/scsn-rna-seq-workflow.png"
+alt="Single cell/nuclei RNA-Seq Workflow" />
+<div class="figcaption">Single cell/nuclei RNA-Seq Workflow</div>
 </div>
 <div id="methods" class="section level2">
 <h2>Methods</h2>
-<div id="qc" class="section level3">
-<h3>QC</h3>
-<p>We use FastQC <span class="citation">(<span>FastQC</span>)</span>
-(v0.11.8) to assess the overall quality of each sequenced sample.</p>
-<p>We use TrimGalore <span
-class="citation">(<span>TrimGalore</span>)</span> (v0.4.5) and cutadapt
-<span class="citation">(Martin)</span> (v1.15) with the following
-parameters:
-<code>--nextera -e 0.1 --stringency 6 --length 20 --nextseq 20</code>.</p>
-<p>We align trimmed reads to the reference genome with Bowtie2 <span
-class="citation">(Langmead and Salzberg, 2012)</span> (v2.3.4.1) with
-the following parameters:
-<code>-X 2000 --no-mixed --no-discordant</code>, and defaults multi-seed
-length of 20bp with 0 mismatches.</p>
-<p>Duplicate reads are marked with Picard <span
-class="citation">(Picard)</span> (v2.20.2).</p>
-<p>Alignments to autosomes and sex chromosomes are kept
-(i.e. mitochondrial reads are removed), duplicates marked by Picard are
-removed, and alignments below a MAPQ threshold are removed. These
-filtering steps are performed with samtools <span class="citation">(Li
-<em>et al.</em>, 2009)</span> (v1.2) and the parameters:
-<code>-q 10 -F 1024</code>.</p>
-<p>Reads completely overlapping blacklisted regions <span
-class="citation">(<span>ENCODE</span> <span>Blacklist</span>
-<span>Regions</span>)</span> are removed with bedtools <span
-class="citation">(Quinlan and Hall, 2010)</span> (v2.28.0).</p>
-<p>Sample-wise peaks are called with macs2 <span class="citation">(Zhang
-<em>et al.</em>, 2008)</span> (v2.1.2) with flags:
-<code>-f BAM --nomodel --shift -100 --extsize 200</code>.</p>
-<p>Peaks over all samples are merged with bedops <span
-class="citation">(Neph <em>et al.</em>, 2012)</span> (v2.4.36) for the
-purpose of principal component analysis and unsupervised clustering to
-assess the similarity of samples.</p>
-<p>Finally, MultiQC <span class="citation">(Ewels <em>et al.</em>,
-2016)</span> (v1.7) generates a report combining FastQC, trimming,
-alignment, and duplicate calling over all the samples. For ATAC specific
-QC metrics we use ataqv <span class="citation">(Ataqv)</span>
-(v1.0.0).</p>
-</div>
-<div id="differential-testing" class="section level3">
-<h3>Differential Testing</h3>
-<p>We use the edgeR R Bioconductor package <span
-class="citation">(McCarthy <em>et al.</em>, 2012)</span> to identify
-regions of differentially open chromatin (DOC). For each sample, the
-number of reads in the merged peaks is counted for each sample, and a
-library size normalization factor is determined. With no replicates, we
-manually tune the BCV (biological coefficient of variance) parameter. We
-then fit each model using the glmFit function, and test each contrast
-with a likelihood ratio test. With replicates, the common, trended, and
-tagwise negative binomial dispersions are calculated. We then fit each
-model using the glmQLFit function, and test each contrast with an
-empirical Bayes quasi-likelihood F-test. The DOC are then annotated to
-genic and CpG island annotations using the annotatr R Bioconductor
-package <span class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
-</div>
-<div id="footprinting" class="section level3">
-<h3>Footprinting</h3>
-<p>We use the HINT tool in the Regulatory Genomics Toolbox (rgt-hint) to
-do footprinting and motif binding analysis <span class="citation">(Li
-<em>et al.</em>, 2019)</span>. Briefly, for each condition, the reads
-among the replicates are pooled and tag counts are determined within the
-merged peaks. Next motifs from the JASPAR database <span
-class="citation">(Khan <em>et al.</em>, 2017)</span> are queried against
-the footprints found within each condition. Finally, a differential
-score representing the transcription factor binding activity and the
-openness of the surrounding chromatin is calculated and visualized
-between pairs of conditions.</p>
-</div>
+<p>Raw sequence data is transformed to gene-barcode count matrices using
+CellRanger <span class="citation">(Zheng <em>et al.</em>, 2017)</span>.
+Further data analysis is primarily performed using the Seurat package
+<span class="citation">(Stuart <em>et al.</em>, 2019)</span>.
+Gene-barcode matrices and metadata for each sample are loaded and
+further filtering and clustering analyses were performed as described in
+the Seurat tutorials <span class="citation">(<span class="nocase">Seurat
+tutorials</span>)</span>. Aberrant cells are filtered (low complexity,
+duplets, or apoptotic cells) and based on detected debris/contamination
+DecontX <span class="citation">(Yang <em>et al.</em>, 2020)</span> may
+be run. Counts are normalized using the default normalization approach
+and variable features were identified. Where appropriate, anchor points
+were then generated across related datasets and used for SCTransform
+data integration. Principal component analysis (PCA) is then performed
+to identify significant PCA components used to find nearest neighbors
+followed by graph-based, semi- unsupervised clustering into distinct
+populations. Projections are generated using uniform manifold
+approximation <span class="citation">(Becht <em>et al.</em>,
+2018)</span> and marker genes are identified through differential gene
+expression pairwise comparisons (Wilcoxon rank-sum test for single-cell
+gene expression; FindAllMarkers function). Cell-type predictions were
+also generated with scCATCH <span class="citation">(Shao <em>et
+al.</em>, 2020)</span>. Suitability and approach for trajectory analysis
+is determined based on experimental design and disease model <span
+class="citation">(Saelens <em>et al.</em>, 2019; Lange <em>et al.</em>,
+2022; Cao <em>et al.</em>, 2019; Wolf <em>et al.</em>, 2019; La Manno
+<em>et al.</em>, 2018; Bergen <em>et al.</em>, 2020)</span>.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-noauthor_ataqv_nodate" class="csl-entry">
-<a href="https://github.com/ParkerLab/ataqv">Ataqv</a>
-<em>https://github.com/ParkerLab/ataqv</em>.
+<div id="ref-Becht_UMAP_2018" class="csl-entry">
+Becht,E. <em>et al.</em> (2018) <a
+href="https://doi.org/10.1038/nbt.4314">Dimensionality reduction for
+visualizing single-cell data using UMAP</a>. <em>Nature
+Biotechnology</em>.
 </div>
-<div id="ref-cavalcante_annotatr_2017" class="csl-entry">
-Cavalcante,R.G. and Sartor,M.A. (2017) <a
-href="https://doi.org/10.1093/bioinformatics/btx183">Annotatr: Genomic
-regions in context</a>. <em>Bioinformatics</em>, <strong>33</strong>,
-2381–2383.
+<div id="ref-Bergen_RNAVelocity_2020" class="csl-entry">
+Bergen,V. <em>et al.</em> (2020) <a
+href="https://doi.org/10.1038/s41587-020-0591-3">Generalizing RNA
+velocity to transient cell states through dynamical modeling</a>.
+<em>Nature Biotechnology</em>, <strong>38</strong>, 1408–1414.
 </div>
-<div id="ref-noauthor_encode_nodate" class="csl-entry">
-<a
-href="https://sites.google.com/site/anshulkundaje/projects/blacklists"><span>ENCODE</span>
-<span>Blacklist</span> <span>Regions</span></a>
-<em>https://sites.google.com/site/anshulkundaje/projects/blacklists</em>.
+<div id="ref-Cao_Monocle3_2019" class="csl-entry">
+Cao,J. <em>et al.</em> (2019) <a
+href="https://doi.org/10.1038/s41586-019-0969-x">The single-cell
+transcriptional landscape of mammalian organogenesis</a>.
+<em>Nature</em>, <strong>566</strong>, 496–502.
 </div>
-<div id="ref-ewels_multiqc_2016" class="csl-entry">
-Ewels,P. <em>et al.</em> (2016) <a
-href="https://doi.org/10.1093/bioinformatics/btw354"><span>MultiQC</span>:
-Summarize analysis results for multiple tools and samples in a single
-report</a>. <em>Bioinformatics</em>, <strong>32</strong>, 3047–3048.
+<div id="ref-La_Manno_RNAVelocity_2018" class="csl-entry">
+La Manno,G. <em>et al.</em> (2018) <a
+href="https://doi.org/10.1038/s41586-018-0414-6">RNA velocity of single
+cells</a>. <em>Nature</em>, <strong>560</strong>, 494–498.
 </div>
-<div id="ref-noauthor_fastqc_nodate" class="csl-entry">
-<a href="https://github.com/s-andrews/FastQC"><span>FastQC</span></a>
-<em>https://github.com/s-andrews/FastQC</em>.
+<div id="ref-Lange_CellRank_2022" class="csl-entry">
+Lange,M. <em>et al.</em> (2022) <a
+href="https://doi.org/10.1038/s41592-021-01346-6">CellRank for directed
+single-cell fate mapping</a>. <em>Nature Methods</em>,
+<strong>19</strong>, 159–170.
 </div>
-<div id="ref-jaspar" class="csl-entry">
-Khan,A. <em>et al.</em> (2017) <a
-href="https://doi.org/10.1093/nar/gkx1126"><span class="nocase">JASPAR
-2018: update of the open-access database of transcription factor binding
-profiles and its web framework</span></a>. <em>Nucleic Acids
-Research</em>, <strong>46</strong>, D260–D266.
+<div id="ref-Saelens_2019" class="csl-entry">
+Saelens,W. <em>et al.</em> (2019) <a
+href="https://doi.org/10.1038/s41587-019-0071-9">A comparison of
+single-cell trajectory inference methods</a>. <em>Nature
+Biotechnology</em>, <strong>37</strong>, 547–554.
 </div>
-<div id="ref-langmead_fast_2012" class="csl-entry">
-Langmead,B. and Salzberg,S.L. (2012) <a
-href="https://doi.org/10.1038/nmeth.1923">Fast gapped-read alignment
-with <span>Bowtie</span> 2</a>. <em>Nature Methods</em>,
-<strong>9</strong>, 357–359.
+<div id="ref-Seurat_tutorials" class="csl-entry">
+<a href="http://satijalab.org/seurat/"><span class="nocase">Seurat
+tutorials</span></a>.
 </div>
-<div id="ref-li_sequence_2009" class="csl-entry">
-Li,H. <em>et al.</em> (2009) <a
-href="https://doi.org/10.1093/bioinformatics/btp352">The
-<span>Sequence</span> <span>Alignment</span>/<span>Map</span> format and
-<span>SAMtools</span></a>. <em>Bioinformatics</em>, <strong>25</strong>,
-2078–2079.
+<div id="ref-Shao_scCATCH_2020" class="csl-entry">
+Shao,X. <em>et al.</em> (2020) <a
+href="https://doi.org/10.1016/j.isci.2020.100882">scCATCH: Automatic
+annotation on cell types of clusters from single-cell RNA sequencing
+data</a>. <em>iScience</em>, <strong>23</strong>, 100882.
 </div>
-<div id="ref-li_hint_2019" class="csl-entry">
-Li,Z. <em>et al.</em> (2019) <a
-href="https://doi.org/10.1186/s13059-019-1642-2">Identification of
-transcription factor binding sites using ATAC-seq</a>. <em>Genome
-Biology</em>, <strong>20</strong>.
+<div id="ref-Stuart_Seurat_2019" class="csl-entry">
+Stuart,T. <em>et al.</em> (2019) <a
+href="https://doi.org/10.1016/j.cell.2019.05.031">Comprehensive
+integration of single-cell data</a>. <em>Cell</em>,
+<strong>177</strong>, 1888–1902.e21.
 </div>
-<div id="ref-martin_cutadapt_nodate" class="csl-entry">
-Martin,M. <a href="https://doi.org/10.14806/ej.17.1.200">Cutadapt
-removes adapter sequences from high-throughput sequencing reads</a>.
-<em>EMBnet.journal</em>, <strong>17</strong>, 3.
+<div id="ref-Wolf_PAGA_2019" class="csl-entry">
+Wolf,F.A. <em>et al.</em> (2019) <a
+href="https://doi.org/10.1186/s13059-019-1663-x">PAGA: Graph abstraction
+reconciles clustering with trajectory inference through a topology
+preserving map of single cells</a>. <em>Genome Biology</em>,
+<strong>20</strong>, 59.
 </div>
-<div id="ref-mccarthy_differential_2012" class="csl-entry">
-McCarthy,D.J. <em>et al.</em> (2012) <a
-href="https://doi.org/10.1093/nar/gks042">Differential expression
-analysis of multifactor <span>RNA</span>-<span>Seq</span> experiments
-with respect to biological variation</a>. <em>Nucleic Acids
-Research</em>, <strong>40</strong>, 4288–4297.
+<div id="ref-Yang_DecontX_2020" class="csl-entry">
+Yang,S. <em>et al.</em> (2020) <a
+href="https://doi.org/10.1186/s13059-020-1950-6">Decontamination of
+ambient RNA in single-cell RNA-seq with DecontX</a>. <em>Genome
+Biology</em>, <strong>21</strong>, 57.
 </div>
-<div id="ref-neph_bedops_2012" class="csl-entry">
-Neph,S. <em>et al.</em> (2012) <a
-href="https://doi.org/10.1093/bioinformatics/bts277"><span>BEDOPS</span>:
-High-performance genomic feature operations</a>.
-<em>Bioinformatics</em>, <strong>28</strong>, 1919–1920.
-</div>
-<div id="ref-noauthor_picard_nodate" class="csl-entry">
-<a href="https://github.com/broadinstitute/picard">Picard</a>
-<em>https://github.com/broadinstitute/picard</em>.
-</div>
-<div id="ref-quinlan_bedtools_2010" class="csl-entry">
-Quinlan,A.R. and Hall,I.M. (2010) <a
-href="https://doi.org/10.1093/bioinformatics/btq033"><span>BEDTools</span>:
-A flexible suite of utilities for comparing genomic features</a>.
-<em>Bioinformatics</em>, <strong>26</strong>, 841–842.
-</div>
-<div id="ref-noauthor_trimgalore_nodate" class="csl-entry">
-<a
-href="https://github.com/FelixKrueger/TrimGalore"><span>TrimGalore</span></a>
-<em>https://github.com/FelixKrueger/TrimGalore</em>.
-</div>
-<div id="ref-zhang_model-based_2008" class="csl-entry">
-Zhang,Y. <em>et al.</em> (2008) <a
-href="https://doi.org/10.1186/gb-2008-9-9-r137">Model-based
-<span>Analysis</span> of <span>ChIP</span>-<span>Seq</span>
-(<span>MACS</span>)</a>. <em>Genome Biology</em>, <strong>9</strong>,
-R137.
+<div id="ref-Zheng_CellRanger_2017" class="csl-entry">
+Zheng,G.X.Y. <em>et al.</em> (2017) <a
+href="https://doi.org/10.1038/ncomms14049">Massively parallel digital
+transcriptional profiling of single cells</a>. <em>Nature
+Communications</em>, <strong>8</strong>, 14049.
 </div>
 </div>
 </div>

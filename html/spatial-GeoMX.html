@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-08-29" />
 
-<title>Bulk ATAC-Seq</title>
+<title>Spatial transcriptomics: Nanostring GeoMX</title>
 
 <script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -68,28 +68,6 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-/* for pandoc --citeproc since 2.11 */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
-</style>
 
 
 
@@ -411,7 +389,8 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Bulk ATAC-Seq</h1>
+<h1 class="title toc-ignore">Spatial transcriptomics: Nanostring
+GeoMX</h1>
 <h4 class="author">UM Bioinformatics Core</h4>
 <h4 class="date">2023-08-29</h4>
 
@@ -429,177 +408,36 @@ pre {
   font-size: 12px
 }
 </style>
-<div class="float">
-<img src="images/Orochi_atac.png" alt="ATAC-Seq workflow" />
-<div class="figcaption">ATAC-Seq workflow</div>
-</div>
+<p><img src="images/spatial-transcriptomics-geomx.png" alt="spatial transcriptomics GeoMX workflow" style="width: 600px;"/></p>
 <div id="methods" class="section level2">
 <h2>Methods</h2>
-<div id="qc" class="section level3">
-<h3>QC</h3>
-<p>We use FastQC <span class="citation">(<span>FastQC</span>)</span>
-(v0.11.8) to assess the overall quality of each sequenced sample.</p>
-<p>We use TrimGalore <span
-class="citation">(<span>TrimGalore</span>)</span> (v0.4.5) and cutadapt
-<span class="citation">(Martin)</span> (v1.15) with the following
-parameters:
-<code>--nextera -e 0.1 --stringency 6 --length 20 --nextseq 20</code>.</p>
-<p>We align trimmed reads to the reference genome with Bowtie2 <span
-class="citation">(Langmead and Salzberg, 2012)</span> (v2.3.4.1) with
-the following parameters:
-<code>-X 2000 --no-mixed --no-discordant</code>, and defaults multi-seed
-length of 20bp with 0 mismatches.</p>
-<p>Duplicate reads are marked with Picard <span
-class="citation">(Picard)</span> (v2.20.2).</p>
-<p>Alignments to autosomes and sex chromosomes are kept
-(i.e. mitochondrial reads are removed), duplicates marked by Picard are
-removed, and alignments below a MAPQ threshold are removed. These
-filtering steps are performed with samtools <span class="citation">(Li
-<em>et al.</em>, 2009)</span> (v1.2) and the parameters:
-<code>-q 10 -F 1024</code>.</p>
-<p>Reads completely overlapping blacklisted regions <span
-class="citation">(<span>ENCODE</span> <span>Blacklist</span>
-<span>Regions</span>)</span> are removed with bedtools <span
-class="citation">(Quinlan and Hall, 2010)</span> (v2.28.0).</p>
-<p>Sample-wise peaks are called with macs2 <span class="citation">(Zhang
-<em>et al.</em>, 2008)</span> (v2.1.2) with flags:
-<code>-f BAM --nomodel --shift -100 --extsize 200</code>.</p>
-<p>Peaks over all samples are merged with bedops <span
-class="citation">(Neph <em>et al.</em>, 2012)</span> (v2.4.36) for the
-purpose of principal component analysis and unsupervised clustering to
-assess the similarity of samples.</p>
-<p>Finally, MultiQC <span class="citation">(Ewels <em>et al.</em>,
-2016)</span> (v1.7) generates a report combining FastQC, trimming,
-alignment, and duplicate calling over all the samples. For ATAC specific
-QC metrics we use ataqv <span class="citation">(Ataqv)</span>
-(v1.0.0).</p>
+<p>Slide preparation, including any morphology marker staining, and full
+ROI or segmented AOI selection will be performed by the Advanced Genomic
+Core (AGC) for an NGS readout workflow. Sequencing depth is estimated by
+multiplying the total area of all the AOIs (µm2) with the appropriate
+sequencing depth factor for the selected GeoMx panel (e.g. Mouse Whole
+Transcriptome Atlas RNA v1.0) and the pooled library will be sequenced.
+Raw FASTQ files are processed using Nanostring’s proprietary Automated
+Data Processing Pipeline, which includes adapter trimming and aligning
+stitched paired-end reads to the barcodes in the reference assay before
+removal of PCR duplicates based on the Unique Molecular Identifier (UMI)
+in each read.</p>
+<p>The resulting DCC files for each full ROI or segmented AOI are then
+processed with the GeoMxTools package using the corresponding Nanostring
+DSP configuration file and the instrument generated LabWorksheet with
+ROI/AOI identifiers and manually annotated group labels. Initial quality
+control filtering and third quartile (Q3) normalization per Nanostring’s
+recommendations for GeoMx DSP data - with minimum average negative
+control measurements for ROI/AOI retention and minimum counts above
+background for target (gene/protein) retention.</p>
+<p>The resulting filtered and Q3 normalized data are used as inputs for
+differential expression comparisons, again with the GeoMxTools package.
+Comparisons within a single slide are generated with an unpaired t-test.
+An absolute fold-change &gt; 1.5 and an FDR adjusted p-value &lt; 0.05
+are used to call differentially expressed targets.</p>
 </div>
-<div id="differential-testing" class="section level3">
-<h3>Differential Testing</h3>
-<p>We use the edgeR R Bioconductor package <span
-class="citation">(McCarthy <em>et al.</em>, 2012)</span> to identify
-regions of differentially open chromatin (DOC). For each sample, the
-number of reads in the merged peaks is counted for each sample, and a
-library size normalization factor is determined. With no replicates, we
-manually tune the BCV (biological coefficient of variance) parameter. We
-then fit each model using the glmFit function, and test each contrast
-with a likelihood ratio test. With replicates, the common, trended, and
-tagwise negative binomial dispersions are calculated. We then fit each
-model using the glmQLFit function, and test each contrast with an
-empirical Bayes quasi-likelihood F-test. The DOC are then annotated to
-genic and CpG island annotations using the annotatr R Bioconductor
-package <span class="citation">(Cavalcante and Sartor, 2017)</span>.</p>
-</div>
-<div id="footprinting" class="section level3">
-<h3>Footprinting</h3>
-<p>We use the HINT tool in the Regulatory Genomics Toolbox (rgt-hint) to
-do footprinting and motif binding analysis <span class="citation">(Li
-<em>et al.</em>, 2019)</span>. Briefly, for each condition, the reads
-among the replicates are pooled and tag counts are determined within the
-merged peaks. Next motifs from the JASPAR database <span
-class="citation">(Khan <em>et al.</em>, 2017)</span> are queried against
-the footprints found within each condition. Finally, a differential
-score representing the transcription factor binding activity and the
-openness of the surrounding chromatin is calculated and visualized
-between pairs of conditions.</p>
-</div>
-</div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="unnumbered">References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-noauthor_ataqv_nodate" class="csl-entry">
-<a href="https://github.com/ParkerLab/ataqv">Ataqv</a>
-<em>https://github.com/ParkerLab/ataqv</em>.
-</div>
-<div id="ref-cavalcante_annotatr_2017" class="csl-entry">
-Cavalcante,R.G. and Sartor,M.A. (2017) <a
-href="https://doi.org/10.1093/bioinformatics/btx183">Annotatr: Genomic
-regions in context</a>. <em>Bioinformatics</em>, <strong>33</strong>,
-2381–2383.
-</div>
-<div id="ref-noauthor_encode_nodate" class="csl-entry">
-<a
-href="https://sites.google.com/site/anshulkundaje/projects/blacklists"><span>ENCODE</span>
-<span>Blacklist</span> <span>Regions</span></a>
-<em>https://sites.google.com/site/anshulkundaje/projects/blacklists</em>.
-</div>
-<div id="ref-ewels_multiqc_2016" class="csl-entry">
-Ewels,P. <em>et al.</em> (2016) <a
-href="https://doi.org/10.1093/bioinformatics/btw354"><span>MultiQC</span>:
-Summarize analysis results for multiple tools and samples in a single
-report</a>. <em>Bioinformatics</em>, <strong>32</strong>, 3047–3048.
-</div>
-<div id="ref-noauthor_fastqc_nodate" class="csl-entry">
-<a href="https://github.com/s-andrews/FastQC"><span>FastQC</span></a>
-<em>https://github.com/s-andrews/FastQC</em>.
-</div>
-<div id="ref-jaspar" class="csl-entry">
-Khan,A. <em>et al.</em> (2017) <a
-href="https://doi.org/10.1093/nar/gkx1126"><span class="nocase">JASPAR
-2018: update of the open-access database of transcription factor binding
-profiles and its web framework</span></a>. <em>Nucleic Acids
-Research</em>, <strong>46</strong>, D260–D266.
-</div>
-<div id="ref-langmead_fast_2012" class="csl-entry">
-Langmead,B. and Salzberg,S.L. (2012) <a
-href="https://doi.org/10.1038/nmeth.1923">Fast gapped-read alignment
-with <span>Bowtie</span> 2</a>. <em>Nature Methods</em>,
-<strong>9</strong>, 357–359.
-</div>
-<div id="ref-li_sequence_2009" class="csl-entry">
-Li,H. <em>et al.</em> (2009) <a
-href="https://doi.org/10.1093/bioinformatics/btp352">The
-<span>Sequence</span> <span>Alignment</span>/<span>Map</span> format and
-<span>SAMtools</span></a>. <em>Bioinformatics</em>, <strong>25</strong>,
-2078–2079.
-</div>
-<div id="ref-li_hint_2019" class="csl-entry">
-Li,Z. <em>et al.</em> (2019) <a
-href="https://doi.org/10.1186/s13059-019-1642-2">Identification of
-transcription factor binding sites using ATAC-seq</a>. <em>Genome
-Biology</em>, <strong>20</strong>.
-</div>
-<div id="ref-martin_cutadapt_nodate" class="csl-entry">
-Martin,M. <a href="https://doi.org/10.14806/ej.17.1.200">Cutadapt
-removes adapter sequences from high-throughput sequencing reads</a>.
-<em>EMBnet.journal</em>, <strong>17</strong>, 3.
-</div>
-<div id="ref-mccarthy_differential_2012" class="csl-entry">
-McCarthy,D.J. <em>et al.</em> (2012) <a
-href="https://doi.org/10.1093/nar/gks042">Differential expression
-analysis of multifactor <span>RNA</span>-<span>Seq</span> experiments
-with respect to biological variation</a>. <em>Nucleic Acids
-Research</em>, <strong>40</strong>, 4288–4297.
-</div>
-<div id="ref-neph_bedops_2012" class="csl-entry">
-Neph,S. <em>et al.</em> (2012) <a
-href="https://doi.org/10.1093/bioinformatics/bts277"><span>BEDOPS</span>:
-High-performance genomic feature operations</a>.
-<em>Bioinformatics</em>, <strong>28</strong>, 1919–1920.
-</div>
-<div id="ref-noauthor_picard_nodate" class="csl-entry">
-<a href="https://github.com/broadinstitute/picard">Picard</a>
-<em>https://github.com/broadinstitute/picard</em>.
-</div>
-<div id="ref-quinlan_bedtools_2010" class="csl-entry">
-Quinlan,A.R. and Hall,I.M. (2010) <a
-href="https://doi.org/10.1093/bioinformatics/btq033"><span>BEDTools</span>:
-A flexible suite of utilities for comparing genomic features</a>.
-<em>Bioinformatics</em>, <strong>26</strong>, 841–842.
-</div>
-<div id="ref-noauthor_trimgalore_nodate" class="csl-entry">
-<a
-href="https://github.com/FelixKrueger/TrimGalore"><span>TrimGalore</span></a>
-<em>https://github.com/FelixKrueger/TrimGalore</em>.
-</div>
-<div id="ref-zhang_model-based_2008" class="csl-entry">
-Zhang,Y. <em>et al.</em> (2008) <a
-href="https://doi.org/10.1186/gb-2008-9-9-r137">Model-based
-<span>Analysis</span> of <span>ChIP</span>-<span>Seq</span>
-(<span>MACS</span>)</a>. <em>Genome Biology</em>, <strong>9</strong>,
-R137.
-</div>
-</div>
+<div id="references" class="section level2">
+<h2>References</h2>
 </div>
 
 

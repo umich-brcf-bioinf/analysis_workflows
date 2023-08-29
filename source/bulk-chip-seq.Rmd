@@ -30,9 +30,11 @@ pre {
 }
 </style>
 
-<img src="images/Orochi_chipdip.png" alt="ChIP-Seq workflow" style="width: 1000px;"/>
+![ChIP-Seq workflow](images/Orochi_chipdip.png)
 
+```{asis, echo = !all_methods}
 ## Methods
+```
 
 ### QC
 
@@ -60,4 +62,6 @@ Peaks over all samples are merged with bedops [@neph_bedops_2012] (v2.4.36) for 
 
 We use the edgeR R Bioconductor package [@mccarthy_differential_2012] to identify regions of differential binding. For each sample, the number of reads in the merged peaks is counted for each sample, and a library size normalization factor is determined. With no replicates, we manually tune the BCV (biological coefficient of variance) parameter. We then fit each model using the glmFit function, and test each contrast with a likelihood ratio test. With replicates, the common, trended, and tagwise negative binomial dispersions are calculated. We then fit each model using the glmQLFit function, and test each contrast with an empirical Bayes quasi-likelihood F-test. The differential peaks are then annotated to genic and CpG island annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
 
+```{asis, echo = !all_methods}
 ## References
+```
