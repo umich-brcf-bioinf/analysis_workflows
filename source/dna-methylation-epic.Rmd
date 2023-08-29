@@ -30,9 +30,11 @@ pre {
 }
 </style>
 
-<img src="images/Orochi_EPIC.png" alt="EPIC methylation array workflow" style="width: 1000px;"/>
+![EPIC methylation array workflow](images/Orochi_EPIC.png)
 
+```{asis, echo = !all_methods}
 ## Methods
+```
 
 ### QC
 
@@ -54,4 +56,6 @@ For each comparison we use the limma R Bioconductor package to identify differen
 
 For each comparison we use the gamlss R package to identify differentially methylated probes (DMPs) by fitting a beta-regression model on the beta-values [@stasinopoulos_generalized_2007]. The DMPs are then annotated to CpG island and genic annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
 
+```{asis, echo = !all_methods}
 ## References
+```

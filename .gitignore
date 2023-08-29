@@ -3,3 +3,4 @@
 **/*.RData
 **/~$*.pptx
 html/images/source
+*.docx

@@ -1,0 +1,42 @@
+---
+title: "Analysis methods"
+author: "UM Bioinformatics Core"
+date: "`r Sys.Date()`"
+output: 
+    bookdown::word_document2:
+      toc: true
+      number_sections: no
+bibliography: references.bib
+csl: bioinformatics.csl
+---
+
+\newpage
+# Bulk RNA-Seq
+```{r child = 'bulk-rna-seq.Rmd'}
+```
+\newpage
+# Single cell/single nuclei RNA-Seq
+```{r child = 'scsn-rna-seq.Rmd'}
+```
+\newpage
+# Bulk ATAC-Seq
+```{r child = 'bulk-atac-seq.Rmd'}
+```
+\newpage
+# Bulk ChIP-Seq
+```{r child = 'bulk-chip-seq.Rmd'}
+```
+\newpage
+# DNA Meythlation: EPIC
+```{r child = 'dna-methylation-epic.Rmd'}
+```
+\newpage
+# DNA Meythlation: DNA-Seq
+```{r child = 'dna-methylation-seq.Rmd'}
+```
+\newpage
+# Spatial Transcriptomics: Nanostring GeoMX
+```{r child = 'spatial-GeoMX.Rmd'}
+```
+\newpage
+# References

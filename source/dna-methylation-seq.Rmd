@@ -30,9 +30,11 @@ pre {
 }
 </style>
 
-<img src="images/Orochi_bs.png" alt="DNA methylation workflow" style="width: 1000px;"/>
+![DNA methylation workflow](images/Orochi_bs.png)
 
+```{asis, echo = !all_methods}
 ## Methods
+```
 
 ### QC
 
@@ -61,4 +63,6 @@ Differential methylation testing is performed with the MethylSig R Bioconductor 
 
 We use the gamlss R package to identify differentially methylated probes (DMPs) by fitting a beta-regression model on the beta-values [@stasinopoulos_generalized_2007]. The DMPs are then annotated to CpG island and genic annotations using the annotatr R Bioconductor package [@cavalcante_annotatr_2017].
 
+```{asis, echo = !all_methods}
 ## References
+```

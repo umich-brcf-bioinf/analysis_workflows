@@ -11,11 +11,11 @@
 
 <meta name="author" content="UM Bioinformatics Core" />
 
-<meta name="date" content="2023-08-21" />
+<meta name="date" content="2023-08-29" />
 
 <title>Bulk RNA-Seq</title>
 
-<script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -31,7 +31,7 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
@@ -68,6 +68,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -328,7 +350,7 @@ div.tocify {
       <ul class="nav navbar-nav">
         <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    RNA-Seq
+    Gene Expression
      
     <span class="caret"></span>
   </a>
@@ -337,10 +359,7 @@ div.tocify {
       <a href="bulk-rna-seq.html">Bulk RNA-Seq</a>
     </li>
     <li>
-      <a href="single-cell-rna-seq.html">Single Cell RNA-Seq</a>
-    </li>
-    <li>
-      <a href="single-nuclei-rna-seq.html">Single Nuclei RNA-Seq</a>
+      <a href="scsn-rna-seq.html">Single Cell/Nuclei RNA-Seq</a>
     </li>
   </ul>
 </li>
@@ -368,6 +387,18 @@ div.tocify {
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Spatial
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="spatial-GeoMX.html">Nanostring GeoMX</a>
+    </li>
+  </ul>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -382,7 +413,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Bulk RNA-Seq</h1>
 <h4 class="author">UM Bioinformatics Core</h4>
-<h4 class="date">2023-08-21</h4>
+<h4 class="date">2023-08-29</h4>
 
 </div>
 
@@ -398,23 +429,91 @@ pre {
   font-size: 12px
 }
 </style>
-<p><img src="images/bulk-rna-seq-workflow.png" alt="RNA-Seq workflow" style="width: 1000px;"/></p>
+<div class="float">
+<img src="images/bulk-rna-seq-workflow.png" alt="RNA-Seq workflow" />
+<div class="figcaption">RNA-Seq workflow</div>
+</div>
 <div id="methods" class="section level2">
 <h2>Methods</h2>
-<p>Adapters will be trimmed with CutAdapt (34) to remove adapters and
-low-quality bases and overall quality will assessed with FastQC,
-FastQCScreen, and MultiQC (32,55,41). Reads will be aligned to Homo
-sapiens (human) genome assembly GRCh38 (hg38) and quantified using
-RSEM/STAR (55,57). Differential expression modeling will use the DESeq2
-(58). Intra and inter group variance will be assessed with Principal
-Component Analysis. Candidate DEGs are visualized with volcano plots
-filtered to the subset of DEGs where Benjamini-Hochberg adjusted p-value
-≤ 0.05 (59). Functional analysis using Advaita iPathwayGuide (60,61)
+<p>Adapters will be trimmed with CutAdapt <span
+class="citation">(Martin)</span> to remove adapters and low-quality
+bases and overall quality will assessed with FastQC <span
+class="citation">(<span>FastQC</span>)</span>, FastQCScreen <span
+class="citation">(Wingett and Andrews, 2018)</span>, and MultiQC <span
+class="citation">(Ewels <em>et al.</em>, 2016)</span>. Reads will be
+aligned and quantified using RSEM/STAR <span class="citation">(Li and
+Dewey, 2011; Dobin <em>et al.</em>, 2013)</span>. Differential
+expression modeling will use the DESeq2 <span class="citation">(Love
+<em>et al.</em>, 2014)</span>. Intra and inter group variance will be
+assessed with Principal Component Analysis. Candidate DEGs are
+visualized with volcano plots filtered to the subset of DEGs where
+Benjamini-Hochberg adjusted p-value ≤ 0.05 <span
+class="citation">(Benjamini and Hochberg, 1995)</span>. Functional
+analysis using Advaita iPathwayGuide <span class="citation">(Draghici
+<em>et al.</em>, 2007; <span class="nocase">iPathwayGuide</span>)</span>
 will assess enrichment of KEGG pathways and Gene Ontology (GO)
 concepts.</p>
 </div>
-<div id="references" class="section level2">
-<h2>References</h2>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Benjamini_FDR_1995" class="csl-entry">
+Benjamini,Y. and Hochberg,Y. (1995) <a
+href="http://www.jstor.org/stable/2346101">Controlling the false
+discovery rate: A practical and powerful approach to multiple
+testing</a>. <em>Journal of the Royal Statistical Society. Series B
+(Methodological)</em>, <strong>57</strong>, 289–300.
+</div>
+<div id="ref-Dobin_STAR_2013" class="csl-entry">
+Dobin,A. <em>et al.</em> (2013) <a
+href="https://doi.org/10.1093/bioinformatics/bts635">STAR: Ultrafast
+universal RNA-seq aligner</a>. <em>Bioinformatics (Oxford,
+England)</em>, <strong>29</strong>, 15–21.
+</div>
+<div id="ref-Draghici_iPathwayGuide_2007" class="csl-entry">
+Draghici,S. <em>et al.</em> (2007) <a
+href="https://doi.org/10.1101/gr.6202607">A systems biology approach for
+pathway level analysis</a>. <em>Genome Research</em>,
+<strong>17</strong>, 1537–1545.
+</div>
+<div id="ref-ewels_multiqc_2016" class="csl-entry">
+Ewels,P. <em>et al.</em> (2016) <a
+href="https://doi.org/10.1093/bioinformatics/btw354"><span>MultiQC</span>:
+Summarize analysis results for multiple tools and samples in a single
+report</a>. <em>Bioinformatics</em>, <strong>32</strong>, 3047–3048.
+</div>
+<div id="ref-noauthor_fastqc_nodate" class="csl-entry">
+<a href="https://github.com/s-andrews/FastQC"><span>FastQC</span></a>
+<em>https://github.com/s-andrews/FastQC</em>.
+</div>
+<div id="ref-noauthor_ipathwayguide" class="csl-entry">
+<a href="https://advaitabio.com/ipathwayguide/"><span
+class="nocase">iPathwayGuide</span></a>.
+</div>
+<div id="ref-Li_RSEM_2011" class="csl-entry">
+Li,B. and Dewey,C.N. (2011) <a
+href="https://doi.org/10.1186/1471-2105-12-323">RSEM: Accurate
+transcript quantification from RNA-seq data with or without a reference
+genome</a>. <em>BMC bioinformatics</em>, <strong>12</strong>, 323.
+</div>
+<div id="ref-Love_DESeq2_2014" class="csl-entry">
+Love,M.I. <em>et al.</em> (2014) <a
+href="https://doi.org/10.1186/s13059-014-0550-8">Moderated estimation of
+fold change and dispersion for RNA-seq data with DESeq2</a>. <em>Genome
+Biology</em>, <strong>15</strong>, 550.
+</div>
+<div id="ref-martin_cutadapt_nodate" class="csl-entry">
+Martin,M. <a href="https://doi.org/10.14806/ej.17.1.200">Cutadapt
+removes adapter sequences from high-throughput sequencing reads</a>.
+<em>EMBnet.journal</em>, <strong>17</strong>, 3.
+</div>
+<div id="ref-Wingett_Andrews_2018" class="csl-entry">
+Wingett,S.W. and Andrews,S. (2018) <a
+href="https://doi.org/10.12688/f1000research.15931.2">FastQ screen: A
+tool for multi-genome mapping and quality control</a>.
+<em>F1000Research</em>, <strong>7</strong>, 1338.
+</div>
+</div>
 </div>
 
 

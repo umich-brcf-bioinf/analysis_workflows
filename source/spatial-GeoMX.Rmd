@@ -1,0 +1,47 @@
+---
+title: "Spatial transcriptomics: Nanostring GeoMX"
+author: "UM Bioinformatics Core"
+date: "`r Sys.Date()`"
+output:
+        html_document:
+            includes:
+                in_header: header.html
+            theme: paper
+            toc: true
+            toc_depth: 4
+            toc_float: true
+            number_sections: false
+            fig_caption: true
+            markdown: GFM
+            code_download: false
+bibliography: references.bib
+csl: bioinformatics.csl
+---
+
+<style type="text/css">
+body, td {
+   font-size: 18px;
+}
+code.r{
+  font-size: 12px;
+}
+pre {
+  font-size: 12px
+}
+</style>
+
+<img src="images/spatial-transcriptomics-geomx.png" alt="spatial transcriptomics GeoMX workflow" style="width: 600px;"/>
+
+```{asis, echo = !all_methods}
+## Methods
+```
+
+Slide preparation, including any morphology marker staining, and full ROI or segmented AOI selection will be performed by the Advanced Genomic Core (AGC) for an NGS readout workflow. Sequencing depth is estimated by multiplying the total area of all the AOIs (µm2) with the appropriate sequencing depth factor for the selected GeoMx panel (e.g. Mouse Whole Transcriptome Atlas RNA v1.0) and the pooled library will be sequenced. Raw FASTQ files are processed using Nanostring’s proprietary Automated Data Processing Pipeline, which includes adapter trimming and aligning stitched paired-end reads to the barcodes in the reference assay before removal of PCR duplicates based on the Unique Molecular Identifier (UMI) in each read.
+
+The resulting DCC files for each full ROI or segmented AOI are then processed with the GeoMxTools package using the corresponding Nanostring DSP configuration file and the instrument generated LabWorksheet with ROI/AOI identifiers and manually annotated group labels. Initial quality control filtering and third quartile (Q3) normalization per Nanostring’s recommendations for GeoMx DSP data - with minimum average negative control measurements for ROI/AOI retention and minimum counts above background for target (gene/protein) retention.
+
+The resulting filtered and Q3 normalized data are used as inputs for differential expression comparisons, again with the GeoMxTools package. Comparisons within a single slide are generated with an unpaired t-test. An absolute fold-change > 1.5 and an FDR adjusted p-value < 0.05 are used to call differentially expressed targets.
+
+```{asis, echo = !all_methods}
+## References
+```
